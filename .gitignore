@@ -1,0 +1,30 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pruebas y herramientas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Configuración local de Streamlit
+.streamlit/secrets.toml
+.streamlit/*.toml
+.env
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
