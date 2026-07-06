@@ -11,63 +11,140 @@ st.markdown("""
 <style>
     .stApp {
         background-color: #0E1117;
-        color: #E6E6E6;
+        color: #F8FAFC;
+    }
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2.5rem;
     }
     .main-header {
-        padding: 1.5rem 0 0.5rem 0;
-        border-bottom: 1px solid #262730;
-        margin-bottom: 1.5rem;
+        padding: 1.4rem 1.25rem;
+        border: 1px solid #243041;
+        border-radius: 14px;
+        background: linear-gradient(90deg, rgba(79, 139, 249, 0.16), rgba(255,255,255,0.02));
+        margin-bottom: 1.4rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
     }
     .main-header h1 {
         color: #FAFAFA;
-        font-size: 2.1rem;
-        margin-bottom: 0.2rem;
+        font-size: 2.2rem;
+        margin-bottom: 0.25rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
     }
     .main-header p {
-        color: #9CA3AF;
-        font-size: 0.95rem;
+        color: #E5E7EB;
+        font-size: 0.96rem;
+        margin: 0;
     }
     .section-title {
         color: #FAFAFA;
-        font-size: 1.15rem;
-        font-weight: 600;
-        margin-top: 1.2rem;
-        margin-bottom: 0.6rem;
+        font-size: 1.16rem;
+        font-weight: 700;
+        margin-top: 1.45rem;
+        margin-bottom: 0.85rem;
         border-left: 4px solid #4F8BF9;
-        padding-left: 0.6rem;
+        padding-left: 0.7rem;
+        letter-spacing: 0.01em;
     }
     div[data-testid="stMetric"] {
         background-color: #161B22;
-        border: 1px solid #262730;
-        border-radius: 10px;
-        padding: 1rem;
+        border: 1px solid #2C3440;
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
+        margin-bottom: 0.9rem;
     }
     div[data-testid="stMetricLabel"] {
-        color: #9CA3AF;
+        color: #E5E7EB !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.01em;
+    }
+    div[data-testid="stMetricValue"] {
+        color: #FAFAFA !important;
+        font-size: 1.5rem !important;
+        font-weight: 800 !important;
+        line-height: 1.2;
+    }
+    div[data-testid="stMetricDelta"] {
+        color: #CBD5E1 !important;
+        font-size: 0.93rem !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stMetricDelta"][style*="color: rgb(0, 128, 0)"],
+    div[data-testid="stMetricDelta"][style*="color: green"],
+    div[data-testid="stMetricDelta"][style*="color: #22C55E"],
+    div[data-testid="stMetricDelta"][style*="color: rgb(34, 197, 94)"] {
+        color: #22C55E !important;
+    }
+    div[data-testid="stMetricDelta"][style*="color: rgb(255, 0, 0)"],
+    div[data-testid="stMetricDelta"][style*="color: red"],
+    div[data-testid="stMetricDelta"][style*="color: #EF4444"],
+    div[data-testid="stMetricDelta"][style*="color: rgb(239, 68, 68)"] {
+        color: #EF4444 !important;
+    }
+    label[data-testid="stWidgetLabel"] {
+        color: #F3F4F6 !important;
+        font-size: 0.96rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.25rem;
+    }
+    div[data-testid="stSelectbox"],
+    div[data-testid="stSlider"] {
+        margin-bottom: 0.4rem;
+    }
+    div[data-testid="stCaption"] {
+        color: #D1D5DB !important;
+        font-size: 0.9rem !important;
+    }
+    div[data-testid="stButton"] > button {
+        background: linear-gradient(90deg, #4F8BF9, #3B82F6);
+        color: #FFFFFF;
+        border: 1px solid #3B82F6;
+        border-radius: 10px;
+        padding: 0.7rem 1.1rem;
+        font-weight: 700;
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.24);
+    }
+    div[data-testid="stButton"] > button:hover {
+        border-color: #7FB0FF;
+        box-shadow: 0 8px 18px rgba(79, 139, 249, 0.3);
+    }
+    div[data-testid="stAlert"] {
+        background-color: rgba(22, 27, 34, 0.95);
+        border: 1px solid #2C3440;
+        color: #F8FAFC;
+        border-radius: 10px;
     }
     .scenario-box {
         background-color: #161B22;
-        border: 1px solid #262730;
-        border-radius: 10px;
+        border: 1px solid #2C3440;
+        border-radius: 12px;
         padding: 1.2rem 1.5rem;
         margin-top: 1rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
     }
     .result-box {
-        background-color: #10291E;
-        border: 1px solid #1F6F4F;
-        border-radius: 10px;
+        background: linear-gradient(135deg, #10291E, #163A2D);
+        border: 1px solid #2E8B57;
+        border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
         margin-top: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
     .result-box h2 {
         color: #4ADE80;
         margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
     }
     .footnote {
-        color: #6B7280;
-        font-size: 0.8rem;
+        color: #9CA3AF;
+        font-size: 0.84rem;
         margin-top: 1rem;
+        line-height: 1.5;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -176,7 +253,7 @@ if st.button("🚀 Calcular Volumen de Ventas Esperado", use_container_width=Tru
 
     st.markdown(f"""
     <div class="result-box">
-        <p style="color:#9CA3AF; margin-bottom:0.3rem;">Ventas Proyectadas — Escenario Base</p>
+        <p style="color:#D1D5DB; margin-bottom:0.35rem; font-weight:600;">Ventas Proyectadas — Escenario Base</p>
         <h2>${pred_base:,.2f} USD</h2>
     </div>
     """, unsafe_allow_html=True)
