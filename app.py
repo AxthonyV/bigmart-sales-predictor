@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 import pickle
 
-st.set_page_config(page_title="BigMart Sales Intelligence", layout="wide", page_icon="📊")
+st.set_page_config(page_title="BigMart Sales Intelligence", layout="wide")
 
 # ----------------------------------------------------------------------------
-# ESTILOS — Dashboard ejecutivo moderno
+# ESTILOS — Dashboard ejecutivo, minimalista y corporativo
 # ----------------------------------------------------------------------------
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -122,15 +122,13 @@ st.markdown("""
     .section-header {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.7rem;
         margin: 2.1rem 0 1rem 0;
     }
-    .section-icon {
-        width: 30px; height: 30px;
-        border-radius: 9px;
-        display: flex; align-items: center; justify-content: center;
-        background: linear-gradient(135deg, #6366F1, #4F46E5);
-        font-size: 0.95rem;
+    .section-marker {
+        width: 4px; height: 22px;
+        border-radius: 3px;
+        background: linear-gradient(180deg, #6366F1, #4F46E5);
         flex-shrink: 0;
     }
     .section-header h3 {
@@ -159,12 +157,47 @@ st.markdown("""
         font-size: 0.88rem;
         font-weight: 700;
         color: #C7CEDE;
-        display: flex;
-        align-items: center;
-        gap: 0.45rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
         margin-bottom: 0.9rem;
         padding-bottom: 0.7rem;
         border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ---------- SUMMARY CHIPS (main canvas) ---------- */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+    .summary-card {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        padding: 1rem 1.15rem;
+    }
+    .summary-card .stitle {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7C8AA5;
+        margin-bottom: 0.65rem;
+        padding-bottom: 0.55rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .summary-card .srow {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.83rem;
+        padding: 0.22rem 0;
+        color: #C7CEDE;
+    }
+    .summary-card .srow b {
+        color: #F1F3F9;
+        font-weight: 600;
+        text-align: right;
     }
 
     /* ---------- WIDGET LABELS / INPUTS ---------- */
@@ -208,6 +241,47 @@ st.markdown("""
         color: #7C8AA5 !important;
         font-size: 0.8rem !important;
     }
+
+    /* ---------- SIDEBAR ---------- */
+    section[data-testid="stSidebar"] {
+        background: #0B0F19;
+        border-right: 1px solid rgba(255,255,255,0.07);
+    }
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 1.6rem;
+    }
+    .sidebar-title {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-bottom: 0.2rem;
+    }
+    .sidebar-desc {
+        color: #7C8AA5;
+        font-size: 0.78rem;
+        margin-bottom: 1.3rem;
+        line-height: 1.5;
+    }
+    .sidebar-sub {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #A5B4FC;
+        margin: 1.1rem 0 0.7rem 0;
+    }
+    .status-badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.35rem 0.65rem;
+        border-radius: 8px;
+        margin-top: 0.2rem;
+    }
+    .status-up { background: rgba(34,197,94,0.12); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
+    .status-down { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.3); }
+    .status-flat { background: rgba(156,166,190,0.1); color: #9CA6BE; border: 1px solid rgba(156,166,190,0.25); }
 
     /* ---------- SCENARIO PANEL ---------- */
     .scenario-panel {
@@ -325,11 +399,102 @@ with open('columnas.pkl', 'rb') as f:
     columnas_modelo = pickle.load(f)
 
 # ----------------------------------------------------------------------------
+# DICCIONARIOS DE VISUALIZACIÓN
+# ----------------------------------------------------------------------------
+tipos_producto = {
+    'Dairy': 'Lácteos', 'Soft Drinks': 'Bebidas gaseosas', 'Meat': 'Carnes',
+    'Fruits and Vegetables': 'Frutas y verduras', 'Household': 'Artículos del hogar',
+    'Baking Goods': 'Repostería', 'Snack Foods': 'Snacks / bocadillos',
+    'Frozen Foods': 'Congelados', 'Breakfast': 'Desayunos',
+    'Health and Hygiene': 'Salud e higiene', 'Hard Drinks': 'Bebidas alcohólicas',
+    'Canned': 'Enlatados', 'Breads': 'Panes', 'Starchy Foods': 'Féculas (papa, arroz, etc.)',
+    'Others': 'Otros', 'Seafood': 'Mariscos'
+}
+tamanos_tienda = {'Small': 'Pequeña', 'Medium': 'Mediana', 'High': 'Grande'}
+zonas = {
+    'Tier 1': 'Tier 1 — Ciudad principal / grande',
+    'Tier 2': 'Tier 2 — Ciudad intermedia',
+    'Tier 3': 'Tier 3 — Ciudad pequeña'
+}
+tipos_tienda = {
+    'Grocery Store': 'Tienda de abarrotes (pequeña, de barrio)',
+    'Supermarket Type1': 'Supermercado estándar (mediano)',
+    'Supermarket Type2': 'Supermercado grande',
+    'Supermarket Type3': 'Hipermercado (el formato más grande)'
+}
+
+# ----------------------------------------------------------------------------
+# SIDEBAR — CONFIGURACIÓN DEL ESCENARIO BASE
+# ----------------------------------------------------------------------------
+with st.sidebar:
+    st.markdown('<div class="sidebar-title">Configuración del Escenario</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sidebar-desc">Define las características del producto y del punto '
+        'de venta que se usarán como escenario base para la predicción.</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="sidebar-sub">Producto</div>', unsafe_allow_html=True)
+    item_mrp = st.slider(
+        "Precio Máximo de Venta (USD)", 30.0, 300.0, 140.0,
+        help="Precio de lista sugerido del producto. A mayor precio, generalmente mayor ingreso por unidad vendida."
+    )
+    item_weight = st.slider(
+        "Peso del Producto (kg)", 4.0, 22.0, 12.0,
+        help="Peso del artículo en kilogramos."
+    )
+    item_fat = st.selectbox(
+        "Contenido de Grasa", ['Low Fat', 'Regular'],
+        help="Clasificación nutricional del producto: bajo en grasa o regular.",
+        format_func=lambda x: "Bajo en grasa" if x == "Low Fat" else "Regular"
+    )
+    item_type = st.selectbox(
+        "Categoría de Producto", list(tipos_producto.keys()),
+        help="Rubro o categoría a la que pertenece el producto.",
+        format_func=lambda x: tipos_producto[x]
+    )
+
+    st.divider()
+    st.markdown('<div class="sidebar-sub">Tienda</div>', unsafe_allow_html=True)
+    outlet_size = st.selectbox(
+        "Tamaño de la Tienda", list(tamanos_tienda.keys()),
+        help="Tamaño físico del establecimiento.",
+        format_func=lambda x: tamanos_tienda[x]
+    )
+    outlet_location = st.selectbox(
+        "Zona de Ubicación", list(zonas.keys()),
+        help="Nivel de la ciudad donde está la tienda. Tier 1 son las ciudades más grandes/importantes, Tier 3 las más pequeñas.",
+        format_func=lambda x: zonas[x]
+    )
+    outlet_type = st.selectbox(
+        "Tipo de Canal", list(tipos_tienda.keys()),
+        help="Formato o tamaño comercial del punto de venta.",
+        format_func=lambda x: tipos_tienda[x]
+    )
+    outlet_age = st.slider(
+        "Antigüedad del Establecimiento (años)", 0, 40, 15,
+        help="Años que la tienda lleva funcionando desde su apertura."
+    )
+
+    st.divider()
+    st.markdown('<div class="sidebar-sub">Visibilidad</div>', unsafe_allow_html=True)
+    item_visibility_ratio = st.slider(
+        "Nivel de Exhibición", 0.0, 3.5, 1.0,
+        help="Compara la exhibición del producto contra el promedio de su categoría. 1.0 = exhibición promedio."
+    )
+    if item_visibility_ratio > 1.0:
+        st.markdown('<span class="status-badge status-up">Sobre el promedio de la categoría</span>', unsafe_allow_html=True)
+    elif item_visibility_ratio < 1.0:
+        st.markdown('<span class="status-badge status-down">Bajo el promedio de la categoría</span>', unsafe_allow_html=True)
+    else:
+        st.markdown('<span class="status-badge status-flat">Exhibición promedio</span>', unsafe_allow_html=True)
+
+# ----------------------------------------------------------------------------
 # HERO / ENCABEZADO
 # ----------------------------------------------------------------------------
 st.markdown("""
 <div class="hero">
-    <div class="hero-badge">📊 UPAO · Aprendizaje Estadístico</div>
+    <div class="hero-badge">UPAO · Aprendizaje Estadístico</div>
     <h1>BigMart Sales Intelligence</h1>
     <p>Plataforma predictiva de ventas basada en Random Forest. Estima el volumen de
     ventas esperado por artículo y simula el impacto financiero de cambios en precio y
@@ -340,17 +505,17 @@ st.markdown("""
 # ----------------------------------------------------------------------------
 # GLOSARIO — para que cualquiera entienda las variables antes de usarlas
 # ----------------------------------------------------------------------------
-with st.expander("📘 ¿Qué significa cada variable? (haz clic para expandir)"):
+with st.expander("Referencia de variables (haga clic para expandir)"):
     st.markdown("""
     <div style="color:#C7CEDE; font-size:0.9rem; line-height:1.7;">
 
-    <b>🛒 Producto</b><br>
+    <b>Producto</b><br>
     • <b>Item_MRP</b>: precio máximo de venta sugerido para el producto (en USD).<br>
     • <b>Item_Weight</b>: peso del producto en kilogramos.<br>
     • <b>Item_Fat_Content</b>: si el producto es bajo en grasa o regular.<br>
     • <b>Item_Type</b>: categoría o rubro del producto (lácteos, bebidas, carnes, etc.).<br><br>
 
-    <b>🏬 Tienda</b><br>
+    <b>Tienda</b><br>
     • <b>Outlet_Size</b>: tamaño físico del establecimiento (pequeño, mediano o grande).<br>
     • <b>Outlet_Location_Type</b>: nivel de la ciudad donde está ubicada la tienda.
       "Tier 1" son ciudades grandes/principales, "Tier 3" son ciudades más pequeñas.<br>
@@ -361,7 +526,7 @@ with st.expander("📘 ¿Qué significa cada variable? (haz clic para expandir)"
       &nbsp;&nbsp;— <i>Hipermercado</i>: el formato más grande de la cadena.<br>
     • <b>Outlet_Age</b>: años que tiene la tienda funcionando desde su apertura.<br><br>
 
-    <b>👁️ Visibilidad</b><br>
+    <b>Visibilidad</b><br>
     • <b>Item_Visibility_MeanRatio</b>: qué tan visible está el producto en la tienda
       comparado con el promedio de su categoría. Un valor de 1.0 significa "exhibición
       promedio"; más de 1.0 significa que tiene más espacio o mejor ubicación en el
@@ -378,7 +543,7 @@ st.markdown("""
     <div class="kpi-card">
         <div class="kpi-label">Algoritmo</div>
         <div class="kpi-value">Random Forest</div>
-        <div class="kpi-sub">↑ 100 árboles</div>
+        <div class="kpi-sub">100 árboles</div>
     </div>
     <div class="kpi-card">
         <div class="kpi-label">Correlación</div>
@@ -399,118 +564,60 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------------
-# LAYOUT DE TRES COLUMNAS: Producto / Tienda / Visibilidad
+# RESUMEN DEL ESCENARIO CONFIGURADO (lienzo principal)
 # ----------------------------------------------------------------------------
 st.markdown("""
 <div class="section-header">
-    <div class="section-icon">⚙️</div>
-    <h3>Parámetros de Predicción <span class="tag">— configura el escenario base</span></h3>
+    <div class="section-marker"></div>
+    <h3>Escenario Base <span class="tag">— configurado desde el panel lateral</span></h3>
 </div>
 """, unsafe_allow_html=True)
 
-col_producto, col_tienda, col_visibilidad = st.columns(3)
-
-with col_producto:
-    st.markdown('<div class="panel"><div class="panel-title">🛒 Producto</div>', unsafe_allow_html=True)
-    item_mrp = st.slider(
-        "💲 Precio Máximo de Venta (USD)", 30.0, 300.0, 140.0,
-        help="Precio de lista sugerido del producto. A mayor precio, generalmente mayor ingreso por unidad vendida."
-    )
-    item_weight = st.slider(
-        "⚖️ Peso del Producto (kg)", 4.0, 22.0, 12.0,
-        help="Peso del artículo en kilogramos."
-    )
-    item_fat = st.selectbox(
-        "🥗 Contenido de Grasa", ['Low Fat', 'Regular'],
-        help="Clasificación nutricional del producto: bajo en grasa o regular.",
-        format_func=lambda x: "Bajo en grasa" if x == "Low Fat" else "Regular"
-    )
-    tipos_producto = {
-        'Dairy': 'Lácteos', 'Soft Drinks': 'Bebidas gaseosas', 'Meat': 'Carnes',
-        'Fruits and Vegetables': 'Frutas y verduras', 'Household': 'Artículos del hogar',
-        'Baking Goods': 'Repostería', 'Snack Foods': 'Snacks / bocadillos',
-        'Frozen Foods': 'Congelados', 'Breakfast': 'Desayunos',
-        'Health and Hygiene': 'Salud e higiene', 'Hard Drinks': 'Bebidas alcohólicas',
-        'Canned': 'Enlatados', 'Breads': 'Panes', 'Starchy Foods': 'Féculas (papa, arroz, etc.)',
-        'Others': 'Otros', 'Seafood': 'Mariscos'
-    }
-    item_type = st.selectbox(
-        "🏷️ Categoría de Producto", list(tipos_producto.keys()),
-        help="Rubro o categoría a la que pertenece el producto.",
-        format_func=lambda x: tipos_producto[x]
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col_tienda:
-    st.markdown('<div class="panel"><div class="panel-title">🏬 Tienda</div>', unsafe_allow_html=True)
-    tamanos_tienda = {'Small': 'Pequeña', 'Medium': 'Mediana', 'High': 'Grande'}
-    outlet_size = st.selectbox(
-        "📐 Tamaño de la Tienda", list(tamanos_tienda.keys()),
-        help="Tamaño físico del establecimiento.",
-        format_func=lambda x: tamanos_tienda[x]
-    )
-    zonas = {
-        'Tier 1': 'Tier 1 — Ciudad principal / grande',
-        'Tier 2': 'Tier 2 — Ciudad intermedia',
-        'Tier 3': 'Tier 3 — Ciudad pequeña'
-    }
-    outlet_location = st.selectbox(
-        "📍 Zona de Ubicación", list(zonas.keys()),
-        help="Nivel de la ciudad donde está la tienda. Tier 1 son las ciudades más grandes/importantes, Tier 3 las más pequeñas.",
-        format_func=lambda x: zonas[x]
-    )
-    tipos_tienda = {
-        'Grocery Store': 'Tienda de abarrotes (pequeña, de barrio)',
-        'Supermarket Type1': 'Supermercado estándar (mediano)',
-        'Supermarket Type2': 'Supermercado grande',
-        'Supermarket Type3': 'Hipermercado (el formato más grande)'
-    }
-    outlet_type = st.selectbox(
-        "🏪 Tipo de Canal", list(tipos_tienda.keys()),
-        help="Formato o tamaño comercial del punto de venta.",
-        format_func=lambda x: tipos_tienda[x]
-    )
-    outlet_age = st.slider(
-        "📅 Antigüedad del Establecimiento (años)", 0, 40, 15,
-        help="Años que la tienda lleva funcionando desde su apertura."
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col_visibilidad:
-    st.markdown('<div class="panel"><div class="panel-title">👁️ Visibilidad</div>', unsafe_allow_html=True)
-    item_visibility_ratio = st.slider(
-        "🔍 Nivel de Exhibición", 0.0, 3.5, 1.0,
-        help="Compara la exhibición del producto contra el promedio de su categoría. 1.0 = exhibición promedio."
-    )
-    if item_visibility_ratio > 1.0:
-        st.caption("✅ Este producto tiene **más exhibición** que el promedio de su categoría (mejor ubicación en tienda).")
-    elif item_visibility_ratio < 1.0:
-        st.caption("⚠️ Este producto tiene **menos exhibición** que el promedio de su categoría.")
-    else:
-        st.caption("➖ Este producto tiene una exhibición **promedio** dentro de su categoría.")
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown(f"""
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="stitle">Producto</div>
+        <div class="srow"><span>Precio</span><b>${item_mrp:,.2f}</b></div>
+        <div class="srow"><span>Peso</span><b>{item_weight:.1f} kg</b></div>
+        <div class="srow"><span>Grasa</span><b>{"Bajo en grasa" if item_fat == "Low Fat" else "Regular"}</b></div>
+        <div class="srow"><span>Categoría</span><b>{tipos_producto[item_type]}</b></div>
+    </div>
+    <div class="summary-card">
+        <div class="stitle">Tienda</div>
+        <div class="srow"><span>Tamaño</span><b>{tamanos_tienda[outlet_size]}</b></div>
+        <div class="srow"><span>Zona</span><b>{outlet_location}</b></div>
+        <div class="srow"><span>Canal</span><b>{outlet_type}</b></div>
+        <div class="srow"><span>Antigüedad</span><b>{outlet_age} años</b></div>
+    </div>
+    <div class="summary-card">
+        <div class="stitle">Visibilidad</div>
+        <div class="srow"><span>Nivel de exhibición</span><b>{item_visibility_ratio:.2f}</b></div>
+        <div class="srow"><span>Referencia</span><b>1.00 = promedio</b></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------------
 # SIMULACIÓN DE ESCENARIOS
 # ----------------------------------------------------------------------------
 st.markdown("""
 <div class="section-header">
-    <div class="section-icon">🧪</div>
+    <div class="section-marker"></div>
     <h3>Simulación de Escenarios <span class="tag">— compara contra el escenario base</span></h3>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="scenario-panel"><p class="desc">Ajusta el precio o la exhibición del producto para proyectar el impacto financiero frente al escenario configurado arriba. Todo lo demás (peso, categoría, tienda) se mantiene igual.</p>', unsafe_allow_html=True)
+st.markdown('<div class="scenario-panel"><p class="desc">Ajuste el precio o la exhibición del producto para proyectar el impacto financiero frente al escenario configurado en el panel lateral. Todo lo demás (peso, categoría, tienda) se mantiene igual.</p>', unsafe_allow_html=True)
 sim_col1, sim_col2 = st.columns(2)
 with sim_col1:
     sim_mrp = st.slider(
-        "💲 Precio Alternativo a Probar (USD)", 30.0, 300.0, item_mrp, key="sim_mrp",
-        help="¿Qué pasaría si el precio fuera este en vez del configurado arriba?"
+        "Precio Alternativo a Probar (USD)", 30.0, 300.0, item_mrp, key="sim_mrp",
+        help="¿Qué pasaría si el precio fuera este en vez del configurado en el panel lateral?"
     )
 with sim_col2:
     sim_visibility = st.slider(
-        "🔍 Exhibición Alternativa a Probar", 0.0, 3.5, item_visibility_ratio, key="sim_vis",
-        help="¿Qué pasaría si el producto tuviera este nivel de exhibición en vez del configurado arriba?"
+        "Exhibición Alternativa a Probar", 0.0, 3.5, item_visibility_ratio, key="sim_vis",
+        help="¿Qué pasaría si el producto tuviera este nivel de exhibición en vez del configurado en el panel lateral?"
     )
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -532,7 +639,7 @@ def predecir(mrp, visibilidad):
 # ----------------------------------------------------------------------------
 # BOTÓN DE EJECUCIÓN Y RESULTADOS
 # ----------------------------------------------------------------------------
-if st.button("🚀  Calcular Volumen de Ventas Esperado", use_container_width=True):
+if st.button("Calcular Predicción", type="primary", use_container_width=True):
     pred_base = predecir(item_mrp, item_visibility_ratio)
     pred_sim = predecir(sim_mrp, sim_visibility)
     delta = pred_sim - pred_base
@@ -546,7 +653,7 @@ if st.button("🚀  Calcular Volumen de Ventas Esperado", use_container_width=Tr
     """, unsafe_allow_html=True)
 
     st.info(
-        f"💡 **Interpretación:** bajo estas condiciones de producto y tienda, el modelo estima "
+        f"**Interpretación:** bajo estas condiciones de producto y tienda, el modelo estima "
         f"aproximadamente **${pred_base:,.2f} USD** en ventas para este ítem. Esta cifra es una "
         f"proyección estadística, no una garantía comercial."
     )
@@ -577,13 +684,11 @@ if st.button("🚀  Calcular Volumen de Ventas Esperado", use_container_width=Tr
     """, unsafe_allow_html=True)
 
     if delta > 0:
-        st.success("📈 El escenario simulado proyecta un incremento en ventas respecto al escenario base.")
+        st.success("El escenario simulado proyecta un incremento en ventas respecto al escenario base.")
     elif delta < 0:
-        st.warning("📉 El escenario simulado proyecta una reducción en ventas respecto al escenario base.")
+        st.warning("El escenario simulado proyecta una reducción en ventas respecto al escenario base.")
     else:
-        st.info("➖ No se proyecta un cambio significativo entre ambos escenarios.")
-
-    st.balloons()
+        st.info("No se proyecta un cambio significativo entre ambos escenarios.")
 
 st.markdown("""
 <p class="footnote">
