@@ -391,12 +391,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------------
-# CARGA DEL MODELO
+# CARGA DEL MODELO (cacheada: se carga una sola vez por sesión, no en cada interacción)
 # ----------------------------------------------------------------------------
-with open('modelo_bigmart.pkl', 'rb') as f:
-    modelo = pickle.load(f)
-with open('columnas.pkl', 'rb') as f:
-    columnas_modelo = pickle.load(f)
+@st.cache_resource
+def cargar_modelo():
+    with open('modelo_bigmart.pkl', 'rb') as f:
+        modelo = pickle.load(f)
+    with open('columnas.pkl', 'rb') as f:
+        columnas_modelo = pickle.load(f)
+    return modelo, columnas_modelo
+
+try:
+    modelo, columnas_modelo = cargar_modelo()
+except FileNotFoundError:
+    st.error(
+        "No se pudieron cargar los archivos del modelo (modelo_bigmart.pkl / columnas.pkl). "
+        "Verifica que estén presentes en el repositorio."
+    )
+    st.stop()
 
 # ----------------------------------------------------------------------------
 # DICCIONARIOS DE VISUALIZACIÓN
@@ -586,7 +598,7 @@ st.markdown(f"""
         <div class="stitle">Tienda</div>
         <div class="srow"><span>Tamaño</span><b>{tamanos_tienda[outlet_size]}</b></div>
         <div class="srow"><span>Zona</span><b>{outlet_location}</b></div>
-        <div class="srow"><span>Canal</span><b>{outlet_type}</b></div>
+        <div class="srow"><span>Canal</span><b>{tipos_tienda[outlet_type]}</b></div>
         <div class="srow"><span>Antigüedad</span><b>{outlet_age} años</b></div>
     </div>
     <div class="summary-card">
