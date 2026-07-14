@@ -1,34 +1,34 @@
 import streamlit as st
 import pandas as pd
 import pickle
-
+ 
 st.set_page_config(page_title="BigMart Sales Intelligence", layout="wide")
-
+ 
 # ----------------------------------------------------------------------------
 # ESTILOS — Dashboard ejecutivo, minimalista y corporativo
 # ----------------------------------------------------------------------------
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+ 
 <style>
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, sans-serif;
     }
-
+ 
     .stApp {
         background: radial-gradient(circle at 10% 0%, #101827 0%, #0A0E17 45%, #060810 100%);
         color: #E7EAF0;
     }
-
+ 
     #MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; }
-
+ 
     .block-container {
         padding-top: 1.6rem;
         padding-bottom: 3rem;
         max-width: 1180px;
     }
-
+ 
     /* ---------- HERO ---------- */
     .hero {
         position: relative;
@@ -77,7 +77,7 @@ st.markdown("""
         max-width: 640px;
         line-height: 1.5;
     }
-
+ 
     /* ---------- KPI CARDS ---------- */
     .kpi-grid {
         display: grid;
@@ -117,7 +117,7 @@ st.markdown("""
         font-weight: 600;
         margin-top: 0.35rem;
     }
-
+ 
     /* ---------- SECTION HEADERS ---------- */
     .section-header {
         display: flex;
@@ -144,7 +144,7 @@ st.markdown("""
         font-weight: 500;
         margin-left: 0.3rem;
     }
-
+ 
     /* ---------- PANEL / GROUP CARDS ---------- */
     .panel {
         background: rgba(255,255,255,0.025);
@@ -163,7 +163,7 @@ st.markdown("""
         padding-bottom: 0.7rem;
         border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-
+ 
     /* ---------- SUMMARY CHIPS (main canvas) ---------- */
     .summary-grid {
         display: grid;
@@ -199,7 +199,7 @@ st.markdown("""
         font-weight: 600;
         text-align: right;
     }
-
+ 
     /* ---------- WIDGET LABELS / INPUTS ---------- */
     label[data-testid="stWidgetLabel"] p {
         color: #AEB6C9 !important;
@@ -241,7 +241,7 @@ st.markdown("""
         color: #7C8AA5 !important;
         font-size: 0.8rem !important;
     }
-
+ 
     /* ---------- SIDEBAR ---------- */
     section[data-testid="stSidebar"] {
         background: #0B0F19;
@@ -282,7 +282,7 @@ st.markdown("""
     .status-up { background: rgba(34,197,94,0.12); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
     .status-down { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.3); }
     .status-flat { background: rgba(156,166,190,0.1); color: #9CA6BE; border: 1px solid rgba(156,166,190,0.25); }
-
+ 
     /* ---------- SCENARIO PANEL ---------- */
     .scenario-panel {
         background: linear-gradient(135deg, rgba(236,72,153,0.07), rgba(99,102,241,0.05));
@@ -297,7 +297,7 @@ st.markdown("""
         margin-top: -0.2rem;
         margin-bottom: 1rem;
     }
-
+ 
     /* ---------- BUTTON ---------- */
     div[data-testid="stButton"] > button {
         background: linear-gradient(135deg, #6366F1, #4338CA);
@@ -316,7 +316,7 @@ st.markdown("""
         box-shadow: 0 12px 28px rgba(99,102,241,0.5);
         transform: translateY(-1px);
     }
-
+ 
     /* ---------- RESULT ---------- */
     .result-hero {
         background: linear-gradient(135deg, rgba(16,185,129,0.14), rgba(16,185,129,0.02));
@@ -341,7 +341,7 @@ st.markdown("""
         font-weight: 800;
         letter-spacing: -0.01em;
     }
-
+ 
     .compare-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -371,14 +371,14 @@ st.markdown("""
     .compare-card .cdelta-up { color: #22C55E; font-weight: 700; font-size: 0.85rem; }
     .compare-card .cdelta-down { color: #F87171; font-weight: 700; font-size: 0.85rem; }
     .compare-card .cdelta-flat { color: #9CA6BE; font-weight: 700; font-size: 0.85rem; }
-
+ 
     div[data-testid="stAlert"] {
         background-color: rgba(255,255,255,0.03) !important;
         border: 1px solid rgba(255,255,255,0.09) !important;
         border-radius: 12px !important;
         color: #D7DCEA !important;
     }
-
+ 
     .footnote {
         color: #5C6580;
         font-size: 0.8rem;
@@ -389,7 +389,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # CARGA DEL MODELO (cacheada: se carga una sola vez por sesión, no en cada interacción)
 # ----------------------------------------------------------------------------
@@ -400,7 +400,7 @@ def cargar_modelo():
     with open('columnas.pkl', 'rb') as f:
         columnas_modelo = pickle.load(f)
     return modelo, columnas_modelo
-
+ 
 try:
     modelo, columnas_modelo = cargar_modelo()
 except FileNotFoundError:
@@ -409,7 +409,7 @@ except FileNotFoundError:
         "Verifica que estén presentes en el repositorio."
     )
     st.stop()
-
+ 
 # ----------------------------------------------------------------------------
 # DICCIONARIOS DE VISUALIZACIÓN
 # ----------------------------------------------------------------------------
@@ -434,7 +434,7 @@ tipos_tienda = {
     'Supermarket Type2': 'Supermercado grande',
     'Supermarket Type3': 'Hipermercado (el formato más grande)'
 }
-
+ 
 # ----------------------------------------------------------------------------
 # SIDEBAR — CONFIGURACIÓN DEL ESCENARIO BASE
 # ----------------------------------------------------------------------------
@@ -445,7 +445,7 @@ with st.sidebar:
         'de venta que se usarán como escenario base para la predicción.</div>',
         unsafe_allow_html=True
     )
-
+ 
     st.markdown('<div class="sidebar-sub">Producto</div>', unsafe_allow_html=True)
     item_mrp = st.slider(
         "Precio Máximo de Venta (USD)", 30.0, 300.0, 140.0,
@@ -465,7 +465,7 @@ with st.sidebar:
         help="Rubro o categoría a la que pertenece el producto.",
         format_func=lambda x: tipos_producto[x]
     )
-
+ 
     st.divider()
     st.markdown('<div class="sidebar-sub">Tienda</div>', unsafe_allow_html=True)
     outlet_size = st.selectbox(
@@ -487,7 +487,7 @@ with st.sidebar:
         "Antigüedad del Establecimiento (años)", 0, 40, 15,
         help="Años que la tienda lleva funcionando desde su apertura."
     )
-
+ 
     st.divider()
     st.markdown('<div class="sidebar-sub">Visibilidad</div>', unsafe_allow_html=True)
     item_visibility_ratio = st.slider(
@@ -500,7 +500,7 @@ with st.sidebar:
         st.markdown('<span class="status-badge status-down">Bajo el promedio de la categoría</span>', unsafe_allow_html=True)
     else:
         st.markdown('<span class="status-badge status-flat">Exhibición promedio</span>', unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # HERO / ENCABEZADO
 # ----------------------------------------------------------------------------
@@ -513,20 +513,20 @@ st.markdown("""
     exhibición en punto de venta.</p>
 </div>
 """, unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # GLOSARIO — para que cualquiera entienda las variables antes de usarlas
 # ----------------------------------------------------------------------------
 with st.expander("Referencia de variables (haga clic para expandir)"):
     st.markdown("""
     <div style="color:#C7CEDE; font-size:0.9rem; line-height:1.7;">
-
+ 
     <b>Producto</b><br>
     • <b>Item_MRP</b>: precio máximo de venta sugerido para el producto (en USD).<br>
     • <b>Item_Weight</b>: peso del producto en kilogramos.<br>
     • <b>Item_Fat_Content</b>: si el producto es bajo en grasa o regular.<br>
     • <b>Item_Type</b>: categoría o rubro del producto (lácteos, bebidas, carnes, etc.).<br><br>
-
+ 
     <b>Tienda</b><br>
     • <b>Outlet_Size</b>: tamaño físico del establecimiento (pequeño, mediano o grande).<br>
     • <b>Outlet_Location_Type</b>: nivel de la ciudad donde está ubicada la tienda.
@@ -537,16 +537,15 @@ with st.expander("Referencia de variables (haga clic para expandir)"):
       &nbsp;&nbsp;— <i>Supermercado grande</i>: mayor variedad y espacio.<br>
       &nbsp;&nbsp;— <i>Hipermercado</i>: el formato más grande de la cadena.<br>
     • <b>Outlet_Age</b>: años que tiene la tienda funcionando desde su apertura.<br><br>
-
+ 
     <b>Visibilidad</b><br>
     • <b>Item_Visibility_MeanRatio</b>: qué tan visible está el producto en la tienda
       comparado con el promedio de su categoría. Un valor de 1.0 significa "exhibición
       promedio"; más de 1.0 significa que tiene más espacio o mejor ubicación en el
       punto de venta que productos similares.
-
+ 
     </div>
     """, unsafe_allow_html=True)
-
 # ----------------------------------------------------------------------------
 # KPIs DEL MODELO
 # ----------------------------------------------------------------------------
@@ -559,22 +558,22 @@ st.markdown("""
     </div>
     <div class="kpi-card">
         <div class="kpi-label">Correlación</div>
-        <div class="kpi-value">0.7396</div>
+        <div class="kpi-value">0.7497</div>
         <div class="kpi-sub">Ajuste del modelo</div>
     </div>
     <div class="kpi-card">
         <div class="kpi-label">MAE</div>
-        <div class="kpi-value">809.17</div>
+        <div class="kpi-value">790.96</div>
         <div class="kpi-sub">Error absoluto medio (USD)</div>
     </div>
     <div class="kpi-card">
         <div class="kpi-label">RMSE</div>
-        <div class="kpi-value">1,150.87</div>
+        <div class="kpi-value">1,133.72</div>
         <div class="kpi-sub">Raíz del error cuadrático (USD)</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # RESUMEN DEL ESCENARIO CONFIGURADO (lienzo principal)
 # ----------------------------------------------------------------------------
@@ -584,7 +583,7 @@ st.markdown("""
     <h3>Escenario Base <span class="tag">— configurado desde el panel lateral</span></h3>
 </div>
 """, unsafe_allow_html=True)
-
+ 
 st.markdown(f"""
 <div class="summary-grid">
     <div class="summary-card">
@@ -608,7 +607,7 @@ st.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # SIMULACIÓN DE ESCENARIOS
 # ----------------------------------------------------------------------------
@@ -618,7 +617,7 @@ st.markdown("""
     <h3>Simulación de Escenarios <span class="tag">— compara contra el escenario base</span></h3>
 </div>
 """, unsafe_allow_html=True)
-
+ 
 st.markdown('<div class="scenario-panel"><p class="desc">Ajuste el precio o la exhibición del producto para proyectar el impacto financiero frente al escenario configurado en el panel lateral. Todo lo demás (peso, categoría, tienda) se mantiene igual.</p>', unsafe_allow_html=True)
 sim_col1, sim_col2 = st.columns(2)
 with sim_col1:
@@ -632,7 +631,7 @@ with sim_col2:
         help="¿Qué pasaría si el producto tuviera este nivel de exhibición en vez del configurado en el panel lateral?"
     )
 st.markdown('</div>', unsafe_allow_html=True)
-
+ 
 # ----------------------------------------------------------------------------
 # FUNCIÓN DE INFERENCIA
 # ----------------------------------------------------------------------------
@@ -647,7 +646,7 @@ def predecir(mrp, visibilidad):
     df_dummies = df_dummies.reindex(columns=columnas_modelo, fill_value=0)
     pred = modelo.predict(df_dummies)[0]
     return max(pred, 0)
-
+ 
 # ----------------------------------------------------------------------------
 # BOTÓN DE EJECUCIÓN Y RESULTADOS
 # ----------------------------------------------------------------------------
@@ -656,27 +655,27 @@ if st.button("Calcular Predicción", type="primary", use_container_width=True):
     pred_sim = predecir(sim_mrp, sim_visibility)
     delta = pred_sim - pred_base
     delta_pct = (delta / pred_base * 100) if pred_base else 0.0
-
+ 
     st.markdown(f"""
     <div class="result-hero">
         <div class="rlabel">Ventas Proyectadas — Escenario Base</div>
         <div class="rvalue">${pred_base:,.2f} USD</div>
     </div>
     """, unsafe_allow_html=True)
-
+ 
     st.info(
         f"**Interpretación:** bajo estas condiciones de producto y tienda, el modelo estima "
         f"aproximadamente **${pred_base:,.2f} USD** en ventas para este ítem. Esta cifra es una "
         f"proyección estadística, no una garantía comercial."
     )
-
+ 
     if delta > 0:
         delta_class, delta_symbol = "cdelta-up", "▲"
     elif delta < 0:
         delta_class, delta_symbol = "cdelta-down", "▼"
     else:
         delta_class, delta_symbol = "cdelta-flat", "—"
-
+ 
     st.markdown(f"""
     <div class="compare-grid">
         <div class="compare-card">
@@ -694,18 +693,18 @@ if st.button("Calcular Predicción", type="primary", use_container_width=True):
         </div>
     </div>
     """, unsafe_allow_html=True)
-
+ 
     if delta > 0:
         st.success("El escenario simulado proyecta un incremento en ventas respecto al escenario base.")
     elif delta < 0:
         st.warning("El escenario simulado proyecta una reducción en ventas respecto al escenario base.")
     else:
         st.info("No se proyecta un cambio significativo entre ambos escenarios.")
-
+ 
 st.markdown("""
 <p class="footnote">
-Modelo: Random Forest Regressor (100 árboles) · Validado con métricas de Weka:
-Correlación 0.7396 · MAE 809.17 · RMSE 1,150.87<br>
+Modelo: Random Forest Regressor (100 árboles) · Validado con métricas de producción (Scikit-Learn):
+Correlación 0.7497 · MAE 790.96 · RMSE 1,133.72<br>
 Proyecto Final — Aprendizaje Estadístico — Universidad Privada Antenor Orrego (UPAO)
 </p>
 """, unsafe_allow_html=True)
